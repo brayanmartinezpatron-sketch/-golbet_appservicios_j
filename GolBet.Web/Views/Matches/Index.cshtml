@@ -3,10 +3,30 @@
 @model IEnumerable<GolBet.Services.DTOs.MatchDto>
 @{
     ViewData["Title"] = "Partidos";
+    var current = (MatchStatus?)ViewBag.CurrentStatus;
 }
-
+ 
 <h2 class="mb-4">⚽ Cartelera de partidos</h2>
 
+<div class="d-flex gap-2 flex-wrap mb-4">
+    <a asp-action="Index"
+           class="btn btn-sm @(current is null ? "btn-success" : "btn-outline-success")">
+        Todos
+    </a>
+    <a asp-action="Index" asp-route-status="@MatchStatus.Scheduled"
+           class="btn btn-sm @(current == MatchStatus.Scheduled ? "btn-success" : "btn-outline-success")">
+        Programados
+    </a>
+    <a asp-action="Index" asp-route-status="@MatchStatus.InProgress"
+           class="btn btn-sm @(current == MatchStatus.InProgress ? "btn-success" : "btn-outline-success")">
+        En juego
+    </a>
+    <a asp-action="Index" asp-route-status="@MatchStatus.Finished"
+           class="btn btn-sm @(current == MatchStatus.Finished ? "btn-success" : "btn-outline-success")">
+        Finalizados
+    </a>
+</div>
+ 
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
     @foreach (var match in Model)
     {
@@ -29,7 +49,7 @@
                             break;
                     }
                 </div>
-
+ 
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center text-center">
                         <div class="w-100">
@@ -37,7 +57,7 @@
                                  alt="@match.HomeTeamName" width="60" height="60" class="mb-1" />
                             <div class="fw-bold small">@match.HomeTeamName</div>
                         </div>
-
+ 
                         <div class="px-3 text-nowrap">
                             @if (match.Status == MatchStatus.Finished)
                             {
@@ -48,7 +68,7 @@
                                 <span class="fs-4 text-muted">vs</span>
                             }
                         </div>
-
+ 
                         <div class="w-100">
                             <img src="@(match.AwayTeamCrestUrl ?? "https://placehold.co/60x60?text=⚽")"
                                  alt="@match.AwayTeamName" width="60" height="60" class="mb-1" />
@@ -56,7 +76,7 @@
                         </div>
                     </div>
                 </div>
-
+ 
                 <div class="card-footer">
                     <div class="row g-2 text-center">
                         <div class="col">
@@ -78,6 +98,11 @@
                             </div>
                         </div>
                     </div>
+
+                    <a asp-action="Detail" asp-route-id="@match.Id"
+                           class="btn btn-sm btn-outline-secondary w-100 mt-2">
+                        Ver detalle
+                    </a>
                 </div>
             </div>
         </div>
