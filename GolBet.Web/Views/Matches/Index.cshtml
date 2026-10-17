@@ -8,7 +8,12 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>⚽ Cartelera de partidos</h2>
-    <a asp-action="Create" class="btn btn-success">+ Nuevo partido</a>
+
+    <!-- Solo el Administrador puede ver el botón de crear nuevo partido -->
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-success">+ Nuevo partido</a>
+    }
 </div>
 
 <div class="d-flex gap-2 flex-wrap mb-4">
@@ -96,7 +101,7 @@
                         </div>
                         <div class="col">
                             <div class="border rounded py-1">
-                                <small class="text-muted d-block">2 · Visitante</small>
+                                <small class="text-muted z-block">2 · Visitante</small>
                                 <span class="fw-bold">@match.AwayOdds.ToString("0.00")</span>
                             </div>
                         </div>
@@ -106,6 +111,15 @@
                        class="btn btn-sm btn-outline-secondary w-100 mt-2">
                         Ver detalle
                     </a>
+
+                    <!-- Botón Editor protegido exclusivamente para el Administrador -->
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@match.Id"
+                           class="btn btn-sm btn-primary w-100 mt-1">
+                            Editor
+                        </a>
+                    }
                 </div>
             </div>
         </div>

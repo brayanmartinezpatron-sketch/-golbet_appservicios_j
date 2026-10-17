@@ -18,4 +18,7 @@ public class Bet : AuditableEntity
 
     public int MatchId { get; set; }
     public Match Match { get; set; } = null!;
+
+    public string UserId { get; set; } = null!;   // FK -> AspNetUsers (string PK)
+    public AppUser User { get; set; } = null!;    // navigation property
 }

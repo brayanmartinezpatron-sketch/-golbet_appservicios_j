@@ -27,10 +27,18 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Matches" asp-action="Index">Partidos</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Teams" asp-action="Index">Equipos</a>
-                        </li>
+
+                        <!-- Solo el Administrador puede ver y gestionar Equipos -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Teams" asp-action="Index">Equipos</a>
+                            </li>
+                        }
                     </ul>
+
+                    <!-- Botones de autenticación y saldo de FutCoins alineados a la derecha -->
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
@@ -56,5 +64,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)</body>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
 </html>
