@@ -35,6 +35,14 @@
                                 <a class="nav-link" asp-controller="Teams" asp-action="Index">Equipos</a>
                             </li>
                         }
+
+                        <!-- Mis apuestas: visible solo para los apostadores -->
+                        @if (User.IsInRole("Apostador"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Bets" asp-action="MyBets">Mis apuestas</a>
+                            </li>
+                        }
                     </ul>
 
                     <!-- Botones de autenticación y saldo de FutCoins alineados a la derecha -->
@@ -51,6 +59,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
+
+        <!-- Alerta de errores para el sistema de apuestas (Módulo 8) -->
+        @if (TempData["Error"] is string errorMessage)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                ⚠️ @errorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -64,6 +82,5 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
+    @await RenderSectionAsync("Scripts", required: false)</body>
 </html>

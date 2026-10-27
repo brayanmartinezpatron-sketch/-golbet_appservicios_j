@@ -43,6 +43,8 @@ builder.Services.AddScoped<IMatchRepository, MatchRepository>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IMatchService, MatchService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IBetRepository, BetRepository>();
+builder.Services.AddScoped<IBetService, BetService>();
 
 var app = builder.Build();
 
