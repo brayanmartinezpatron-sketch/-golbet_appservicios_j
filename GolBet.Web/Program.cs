@@ -7,6 +7,7 @@ using GolBet.Services.Interfaces;
 using GolBet.Services.Mapping;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Globalization;
 
 var culture = new CultureInfo("es-CO");
@@ -15,15 +16,16 @@ CultureInfo.DefaultThreadCurrentUICulture = culture;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((context, config) =>
+    config.ReadFrom.Configuration(context.Configuration));
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ---- Configuración de Identity (Módulo 7) ----
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
-    // Política de contraseñas amigable para entorno académico
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
@@ -34,8 +36,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Account/Login";           // Redirección si intenta entrar sin estar logueado
-    options.AccessDeniedPath = "/Account/AccessDenied";  // Redirección si no tiene el rol permitido
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -48,7 +50,14 @@ builder.Services.AddScoped<IBetService, BetService>();
 
 var app = builder.Build();
 
-// ---- Seeder actualizado con Identity (Módulo 7) ----
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error/General");
+    app.UseHsts();
+}
+
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
+
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -57,20 +66,15 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(context, roleManager, userManager);
 }
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseSerilogRequestLogging();
+
 app.UseRouting();
 
-// ---- Pipeline de Autenticación y Autorización (¡El orden importa!) ----
-app.UseAuthentication();   // 1. Identifica quién eres (lee la cookie)
-app.UseAuthorization();    // 2. Decide si puedes hacer la acción ([Authorize])
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
